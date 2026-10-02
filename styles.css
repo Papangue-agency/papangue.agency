@@ -1,0 +1,577 @@
+/* ========================================================================
+   Papangue :: ecommerce studio
+   Palette: cobalt / sun / emerald / raspberry / crimson + paper & ink
+   Type:    Spline Sans Mono (display & utility, receipt-like) · Schibsted Grotesk (body)
+   ======================================================================== */
+
+:root {
+  --ink: #171224;
+  --paper: #FFFDF6;
+  --cobalt: #1F2ACF;
+  --sun: #FFC933;
+  --emerald: #0B6B49;
+  --rasp: #FFB505;
+  --crimson: #CD0707;
+
+  --font-display: "Spline Sans Mono", "Courier New", monospace;
+  --font-body: "Schibsted Grotesk", "Segoe UI", system-ui, sans-serif;
+  --font-mono: "Spline Sans Mono", "Courier New", monospace;
+
+  --wrap: 1200px;
+  --pad: clamp(1.25rem, 4vw, 3rem);
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+html { scroll-behavior: smooth; }
+
+/* Lenis drives scrolling when active: hand control back to the JS. */
+html.lenis { scroll-behavior: auto; }
+
+body {
+  font-family: var(--font-body);
+  font-size: 1.0625rem;
+  line-height: 1.6;
+  color: var(--paper);
+  background: var(--crimson);
+}
+
+img, svg { display: block; max-width: 100%; }
+ul { list-style: none; }
+a { color: inherit; }
+
+:focus-visible {
+  outline: 3px solid var(--sun);
+  outline-offset: 3px;
+  border-radius: 2px;
+}
+
+/* ---------- wordmark & contact (fixed) ---------- */
+
+.brand {
+  position: fixed;
+  inset: 0 0 auto 0;
+  z-index: 50;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.1rem var(--pad);
+  pointer-events: none;
+  mix-blend-mode: difference;
+  color: #fff;
+  transition: color 0.35s;
+}
+
+.brand a { pointer-events: auto; text-decoration: none; }
+
+/* On chapters 01-05 the wordmark takes a fixed color, no blending
+   (data-chapter is set on <body> by app.js from the active scene).
+   Only the intro (0) keeps white in difference mode. */
+body[data-chapter="1"] .brand,
+body[data-chapter="2"] .brand,
+body[data-chapter="3"] .brand,
+body[data-chapter="4"] .brand,
+body[data-chapter="5"] .brand { mix-blend-mode: normal; color: var(--paper); }
+/* Chapter 01 exception: paper on sun is unreadable → ink. */
+body[data-chapter="1"] .brand { color: var(--ink); }
+/* Contact: paper turns to sun (difference blending shifted to mint while
+   the crimson was still visible under the scene). */
+body[data-chapter="5"] .brand { color: var(--sun); }
+
+.brand-mark {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 0.95rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.brand-mark span { opacity: 0.55; font-weight: 500; }
+
+.brand-contact {
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  border-bottom: 2px solid currentColor;
+  padding-bottom: 2px;
+}
+
+/* ---------- progress thread (left) ---------- */
+
+.thread {
+  position: fixed;
+  left: calc(var(--pad) / 2);
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  z-index: 40;
+  color: #fff;
+  background: color-mix(in srgb, currentColor 25%, transparent);
+  mix-blend-mode: difference;
+  transition: color 0.35s;
+}
+
+.thread i {
+  display: block;
+  width: 100%;
+  height: 100%;
+  background: currentColor;
+  transform-origin: top;
+  transform: scaleY(var(--progress, 0));
+}
+
+/* Same treatment as the wordmark: on chapters 01-05 the thread takes a
+   fixed color, otherwise difference blending turns it cyan on the crimson
+   and blue on the sun. Only the intro (0) keeps white.
+   The groove stays the same tone at 25% so progress remains readable. */
+body[data-chapter="1"] .thread,
+body[data-chapter="2"] .thread,
+body[data-chapter="3"] .thread,
+body[data-chapter="4"] .thread,
+body[data-chapter="5"] .thread { mix-blend-mode: normal; color: var(--paper); }
+
+body[data-chapter="1"] .thread { color: var(--ink); }
+body[data-chapter="5"] .thread { color: var(--sun); }
+
+/* ---------- chapter rail (right) ---------- */
+
+.rail {
+  position: fixed;
+  right: 1.1rem;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 50;
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+  padding: 0.85rem 0.6rem;
+  border-radius: 999px;
+  background: rgba(15, 10, 30, 0.55);
+  backdrop-filter: blur(6px);
+}
+
+.rail a {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  text-decoration: none;
+  color: #fff;
+}
+
+.rail a i {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.4);
+  transition: transform 0.25s, background 0.25s;
+  flex: none;
+}
+
+.rail a b {
+  position: absolute;
+  right: 2.6rem;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  background: rgba(15, 10, 30, 0.8);
+  padding: 0.25rem 0.6rem;
+  border-radius: 4px;
+  opacity: 0;
+  transform: translateX(6px);
+  transition: opacity 0.2s, transform 0.2s;
+  pointer-events: none;
+  white-space: nowrap;
+}
+
+.rail a:hover b, .rail a:focus-visible b { opacity: 1; transform: none; }
+
+.rail a.is-active i {
+  background: var(--sun);
+  transform: scale(1.5);
+}
+
+/* ---------- scenes ---------- */
+
+.scene {
+  position: relative;
+  min-height: 100vh;
+  min-height: 100svh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  overflow: hidden;
+  box-shadow: 0 -35px 70px rgba(12, 6, 28, 0.35);
+}
+
+@media (min-width: 900px) {
+  .scene { position: sticky; top: 0; }
+}
+
+.wrap {
+  width: 100%;
+  max-width: var(--wrap);
+  margin: 0 auto;
+  padding: 6rem var(--pad);
+}
+
+.scene--hero    { background: var(--cobalt);  color: var(--paper); }
+.scene--sun     { background: var(--sun);     color: var(--ink);   }
+.scene--emerald { background: var(--emerald); color: var(--paper); }
+.scene--rasp    { background: var(--rasp);    color: var(--paper); }
+.scene--crimson   { background: var(--crimson);   color: var(--paper); }
+.scene--contact { background: var(--cobalt);  color: var(--paper); }
+
+/* ---------- typography ---------- */
+
+.eyebrow {
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  margin-bottom: 1.2rem;
+  opacity: 0.85;
+}
+
+h1, h2 {
+  font-family: var(--font-display);
+  text-wrap: balance;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  line-height: 1.18;
+}
+
+h1 {
+  font-size: clamp(1.7rem, 4.3vw, 3.3rem);
+  font-weight: 700;
+  max-width: 22ch;
+}
+
+h1 em {
+  font-style: normal;
+  color: var(--sun);
+}
+
+h2 {
+  font-size: clamp(1.25rem, 2.9vw, 2.15rem);
+  font-weight: 700;
+  margin-bottom: 1.2rem;
+  max-width: 26ch;
+}
+
+.lede {
+  font-size: clamp(1.05rem, 1.6vw, 1.3rem);
+  max-width: 46ch;
+  margin-top: 1.4rem;
+  opacity: 0.92;
+}
+
+.chapter-text > p:not(.eyebrow):not(.chapter-num) {
+  max-width: 52ch;
+  opacity: 0.94;
+}
+
+/* ---------- hero ---------- */
+
+.hero-wrap { position: relative; z-index: 2; }
+
+.cta-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-top: 2.4rem;
+}
+
+.btn {
+  display: inline-block;
+  font-family: var(--font-mono);
+  font-size: 0.9rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  text-decoration: none;
+  padding: 0.95rem 1.6rem;
+  border-radius: 999px;
+  transition: background 0.2s, color 0.2s, border-color 0.2s;
+}
+
+.btn--sun { background: var(--sun); color: var(--ink); }
+
+.btn--ghost {
+  border: 2px solid rgba(255, 253, 246, 0.55);
+  color: var(--paper);
+}
+
+.btn--ghost:hover { border-color: var(--paper); }
+
+/* "CH.0X ↓" link to the next chapter: mobile only (the rail handles
+   navigation on desktop). Its color = background of the chapter announced. */
+.btn--next { display: none; }
+
+.scene--sun .btn--next     { background: var(--paper); color: var(--emerald); }
+.scene--emerald .btn--next { background: var(--paper); color: var(--rasp);    }
+.scene--rasp .btn--next    { background: var(--paper); color: var(--crimson); }
+.scene--crimson .btn--next { background: var(--paper); color: var(--cobalt);  }
+
+/* hero decor: multicolored dot field (Canvas, driven by app.js) */
+
+.deco { position: absolute; inset: 0; z-index: 1; pointer-events: none; }
+
+.hero-dots {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+/* chapter decor: one geometric shape in close-up (WebGL, driven by shape.js) */
+
+.shape-canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.scene > .wrap { position: relative; z-index: 2; }
+
+/* services ticker */
+
+.ticker {
+  position: absolute;
+  left: 0; right: 0; bottom: 0;
+  padding: 0.9rem 0;
+  border-top: 2px solid rgba(255, 253, 246, 0.25);
+  overflow: hidden;
+  z-index: 2;
+}
+
+.ticker-track {
+  display: flex;
+  gap: 2.6rem;
+  width: max-content;
+  white-space: nowrap;
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  animation: ticker 30s linear infinite;
+}
+
+.ticker-track span::after {
+  content: "★";
+  margin-left: 2.6rem;
+  color: var(--sun);
+}
+
+@keyframes ticker {
+  to { transform: translateX(-50%); }
+}
+
+/* When GSAP drives the ticker (speed tied to scrolling), drop the CSS animation. */
+.ticker--js .ticker-track { animation: none; }
+
+/* ---------- chapters ---------- */
+
+.chapter {
+  display: grid;
+  grid-template-columns: 1.1fr 0.9fr;
+  gap: clamp(2rem, 5vw, 5rem);
+  align-items: center;
+}
+
+.chapter--flip .chapter-receipt { order: -1; }
+
+.chapter-text { position: relative; }
+
+.chapter-num {
+  position: absolute;
+  top: -1.6em;
+  left: -0.05em;
+  font-family: var(--font-display);
+  font-size: clamp(5rem, 11vw, 9rem);
+  font-weight: 700;
+  line-height: 1;
+  color: transparent;
+  -webkit-text-stroke: 2px currentColor;
+  opacity: 0.16;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.chapter-text > * { position: relative; z-index: 1; }
+
+.tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.55rem;
+  margin-top: 1.6rem;
+}
+
+.tags li {
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  padding: 0.4rem 0.85rem;
+  border: 2px solid currentColor;
+  border-radius: 999px;
+  opacity: 0.9;
+}
+
+/* ---------- receipt ---------- */
+
+.chapter-receipt { display: flex; justify-content: center; }
+
+.receipt {
+  position: relative;
+  width: min(340px, 100%);
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--font-mono);
+  padding: 1.6rem 1.5rem 1.2rem;
+  box-shadow: 0 24px 48px rgba(12, 6, 28, 0.35);
+  rotate: 1.5deg;
+  transition: rotate 0.3s;
+}
+
+.chapter--flip .receipt { rotate: -1.5deg; }
+
+.receipt:hover { rotate: 0deg; }
+
+.receipt-head {
+  font-size: 0.8rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-align: center;
+  padding-bottom: 0.9rem;
+  margin-bottom: 0.9rem;
+  border-bottom: 2px dashed rgba(23, 18, 36, 0.35);
+}
+
+.receipt ul { display: grid; gap: 0.55rem; }
+
+.receipt li, .receipt-total {
+  display: flex;
+  align-items: baseline;
+  gap: 0.5rem;
+  font-size: 0.82rem;
+}
+
+.receipt li i, .receipt-total i {
+  flex: 1;
+  border-bottom: 2px dotted rgba(23, 18, 36, 0.4);
+  transform: translateY(-3px);
+}
+
+.receipt-total {
+  font-weight: 600;
+  font-size: 0.85rem;
+  margin-top: 1rem;
+  padding-top: 0.9rem;
+  border-top: 2px dashed rgba(23, 18, 36, 0.35);
+}
+
+.barcode {
+  height: 30px;
+  margin-top: 1.1rem;
+  background: repeating-linear-gradient(
+    90deg,
+    var(--ink) 0 2px, transparent 2px 5px,
+    var(--ink) 5px 6px, transparent 6px 11px,
+    var(--ink) 11px 14px, transparent 14px 17px
+  );
+}
+
+.receipt-tear {
+  position: absolute;
+  left: 0;
+  bottom: -9px;
+  width: 100%;
+  height: 10px;
+}
+
+.receipt-tear path { fill: var(--paper); }
+
+/* ---------- contact ---------- */
+
+.contact-wrap { text-align: center; }
+
+.contact-wrap h2 {
+  font-size: clamp(1.8rem, 5vw, 3.8rem);
+  margin: 0 auto 1rem;
+}
+
+.contact-wrap .lede { margin: 0 auto; }
+
+.contact-mail {
+  display: inline-block;
+  margin-top: 2.6rem;
+  font-family: var(--font-display);
+  font-size: clamp(1rem, 2.2vw, 1.55rem);
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  color: var(--sun);
+  text-decoration: none;
+  border-bottom: 4px solid var(--sun);
+  padding-bottom: 0.3rem;
+  transition: color 0.2s, border-color 0.2s;
+}
+
+.contact-mail:hover { color: var(--paper); border-color: var(--paper); }
+
+.footer {
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 5rem;
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  opacity: 0.7;
+}
+
+/* ---------- reveals ---------- */
+
+[data-reveal] {
+  opacity: 0;
+  transform: translateY(26px);
+  transition: opacity 0.7s ease, transform 0.7s ease;
+}
+
+[data-reveal].is-in { opacity: 1; transform: none; }
+
+/* ---------- responsive ---------- */
+
+@media (max-width: 899px) {
+  .rail { display: none; }
+  .thread { display: none; }
+
+  .chapter { grid-template-columns: 1fr; }
+  .chapter--flip .chapter-receipt { order: 0; }
+
+  .wrap { padding: 5rem var(--pad) 4rem; }
+
+  .chapter-num { top: -0.55em; }
+
+  .btn--next { display: inline-block; margin-top: 1.8rem; }
+}
+
+/* ---------- reduced motion ---------- */
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+
+  .ticker-track { animation: none; }
+
+  [data-reveal] {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+}
